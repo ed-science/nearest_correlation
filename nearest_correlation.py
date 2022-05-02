@@ -91,19 +91,20 @@ def nearcorr(A, tol=[], flag=0, max_iterations=100, n_pos_eig=0,
     while max(rel_diffX, rel_diffY, rel_diffXY) > tol[0]:
         iteration += 1
         if iteration > max_iterations:
-            if except_on_too_many_iterations:
-                if max_iterations == 1:
-                    message = "No solution found in "\
-                              + str(max_iterations) + " iteration"
-                else:
-                    message = "No solution found in "\
-                              + str(max_iterations) + " iterations"
-                raise ExceededMaxIterationsError(message, X, iteration, ds)
-            else:
+            if not except_on_too_many_iterations:
                 # exceptOnTooManyIterations is false so just silently
                 # return the result even though it has not converged
                 return X
 
+            message = (
+                "No solution found in " + str(max_iterations) + " iteration"
+                if max_iterations == 1
+                else "No solution found in "
+                + str(max_iterations)
+                + " iterations"
+            )
+
+            raise ExceededMaxIterationsError(message, X, iteration, ds)
         Xold = copy(X)
         R = X - ds
         R_wtd = Whalf*R
